@@ -1,0 +1,11 @@
+# Ignore all .env files recursively
+**/.env
+
+# Ignore all .log files recursively
+**/*.log
+
+# Ignore all node_modules folders recursively
+**/node_modules/
+
+# Ignore all dist folders recursively
+**/dist/
