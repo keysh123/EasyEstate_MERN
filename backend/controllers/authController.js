@@ -1,21 +1,21 @@
 const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { errorHandler } = require("../utils/error");
 
-const register = async (req, res) => {
+const register = async (req, res,next) => {
     try {
     const {username , email, password } = req.body;
     if (!username || !email || !password) {
-        return res.status(400).json({ message: "All fields are required" });    
+        return next(errorHandler(400, "All fields are required"));    
     }
-    const existingUser = await User.find({ email });
-    if (existingUser.length > 0) {
-        return res.status(400).json({ message: "User already exists" });    
-    }
-    const newUser = new User({ username, email, password });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, email, password : hashedPassword });
     await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ success : true, message: "User registered successfully" });
     }
     catch (error) {
-        res.status(500).json({ message: "Server error" });
+        next(error);
     }
 };
 const login = async (req, res) => {};
