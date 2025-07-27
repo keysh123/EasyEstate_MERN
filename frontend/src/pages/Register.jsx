@@ -79,7 +79,7 @@ const Register = () => {
 
           <button
             type="submit"
-            className="bg-slate-600 hover:bg-slate-700 transition text-white py-2 rounded-md font-medium mt-5"
+            className="bg-slate-700 hover:bg-slate-500 transition text-white py-2 rounded-md font-medium mt-5"
             disabled={loading}
           >
             {loading ? "Loading" : "Register"}
