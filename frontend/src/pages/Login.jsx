@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginStart , loginFailure , loginSuccess } from "../../services/userSlice";
+import { loginStart , loginFailure , loginSuccess } from "../services/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAth from "../components/OAth";
 
 
 
@@ -45,14 +46,14 @@ const Login = () => {
 
     const data = await response.json();
     if (data.success) {
-      toast.success("Login successful");
+      // toast.success("Login successful");
       dispatch(loginSuccess(data.user));
       
       navigate("/");
     } else {
       
       // console.error("Registration error:", data);
-      toast.error(data.message || "Login failed");
+      // toast.error(data.message || "Login failed");
       dispatch(loginFailure(data.message || "Login failed"));
     }
 
@@ -90,14 +91,15 @@ const Login = () => {
           >
             {loading ? "Loading" : "Login"}
           </button>
+          <OAth/>
 
-          <button
+          {/* <button
             type="button"
             disabled={loading}
             className="bg-red-700 hover:bg-red-800 transition text-white py-2 rounded-md font-medium"
           >
             {loading ? "Loading" : "Continue with Google"}
-          </button>
+          </button> */}
 
           {error && (
             <p className="text-center text-red-500 text-sm font-medium mt-1">

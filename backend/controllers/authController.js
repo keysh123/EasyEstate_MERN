@@ -52,9 +52,57 @@ const login = async (req, res, next) => {
         next(error);
     }
 };
+const google = async (req, res, next) => {
+  try {
+    const email = req.body.email?.toLowerCase();
+    let user = await User.findOne({ email });
+
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const { password, ...userWithoutPassword } = user._doc;
+      return res
+        .cookie("access_token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: "lax",
+        })
+        .status(200)
+        .json({ success: true, message: "Login successful", user: userWithoutPassword });
+    }
+
+    const generatedUsername = req.body.name.replace(/\s+/g, '').toLowerCase() + Math.floor(Math.random() * 1000);
+    const generatedPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+    const newUser = new User({
+      username: generatedUsername,
+      email,
+      profilePicture: req.body.picture,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const { password, ...userWithoutPassword } = newUser._doc;
+
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "lax",
+    }).status(201).json({
+      success: true,
+      message: "User registered and logged in successfully",
+      user: userWithoutPassword
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
 module.exports = {
   register,
   login,
+   google
 };

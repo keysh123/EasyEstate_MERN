@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import OAth from "../components/OAth";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -85,13 +86,15 @@ const Register = () => {
             {loading ? "Loading" : "Register"}
           </button>
 
+          <OAth/>
+{/* 
           <button
             type="button"
             disabled={loading}
             className="bg-red-700 hover:bg-red-800 transition text-white py-2 rounded-md font-medium"
           >
             {loading ? "Loading" : "Continue with Google"}
-          </button>
+          </button> */}
 
           {error && (
             <p className="text-center text-red-500 text-sm font-medium mt-1">
