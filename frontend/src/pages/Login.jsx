@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { loginStart , loginFailure , loginSuccess } from "../../services/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+
+
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { currentUser, error, loading } = useSelector((state) => state.user)
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
  
   });
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setCredentials({
@@ -21,7 +27,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(loginStart());
+    
+    
 
     const response = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
@@ -38,15 +46,17 @@ const Login = () => {
     const data = await response.json();
     if (data.success) {
       toast.success("Login successful");
+      dispatch(loginSuccess(data.user));
       
       navigate("/");
     } else {
-      setError(data.message || "Login failed");
+      
       // console.error("Registration error:", data);
       toast.error(data.message || "Login failed");
+      dispatch(loginFailure(data.message || "Login failed"));
     }
 
-    setLoading(false);
+    
   };
 
   return (
