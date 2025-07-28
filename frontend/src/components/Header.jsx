@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { FaSearch, FaBars } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import {useSelector} from 'react-redux';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
 
   return (
     <header className='bg-slate-200 shadow-md sticky top-0 z-50'>
@@ -35,7 +37,14 @@ const Header = () => {
             <Link to='/about' className='hover:underline'>About</Link>
           </li>
           <li>
-            <Link to='/login' className='hover:underline'>Sign In</Link>
+            
+            <Link to='/profile' className='hover:underline'>
+            {
+              currentUser ?
+              <img src={currentUser?.profilePicture} alt="Profile" className='rounded-full h-7 w-7 object-cover'/> :
+              <span>Sign In</span>
+            }
+            </Link>
           </li>
         </ul>
 
