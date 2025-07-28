@@ -40,9 +40,37 @@ const userSlice = createSlice({
             state.error = action.payload;
             toast.error(action.payload || "Profile update failed");
         },
+        deleteUserStart: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        deleteUserSuccess: (state) => {
+            state.currentUser = null;
+            state.loading = false;
+            toast.success("Account deleted successfully");
+        },
+        deleteUserFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+            toast.error(action.payload || "Account deletion failed");
+        },
+        logoutUserStart: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        logoutUserSuccess: (state) => {
+            state.currentUser = null;
+            state.loading = false;
+            toast.success("Logged out successfully");
+        },
+        logoutUserFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+            toast.error(action.payload || "Logout failed");
+        },
 
     },
 
 })
-export const { loginStart, loginSuccess, loginFailure ,updateUserStart , updateUserFailure , updateUserSuccess } = userSlice.actions;
+export const { loginStart, loginSuccess, loginFailure ,updateUserStart , updateUserFailure , updateUserSuccess ,deleteUserFailure , deleteUserStart , deleteUserSuccess , logoutUserFailure , logoutUserStart , logoutUserSuccess} = userSlice.actions;
 export default userSlice.reducer;

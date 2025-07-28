@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { updateUserStart , updateUserFailure , updateUserSuccess } from '../services/userSlice';
+import { updateUserStart , updateUserFailure , updateUserSuccess , deleteUserFailure , deleteUserStart , deleteUserSuccess, logoutUserFailure , logoutUserSuccess , logoutUserStart} from '../services/userSlice';
+import DialogBox from '../components/DialogBox';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -10,6 +11,10 @@ const Profile = () => {
   
   const fileInputRef = useRef(null);
   const { currentUser , loading } = useSelector((state) => state.user);
+  // Dialog state
+const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
 
   const [profileData, setProfileData] = useState({
     username: currentUser.username || '',
@@ -103,6 +108,46 @@ const Profile = () => {
       
     }
   }
+  const handleDelete = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/delete/${currentUser._id}`, {
+        method: 'DELETE',
+        credentials: 'include', // Include cookies in the request
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        dispatch(deleteUserSuccess());
+        return
+       
+      } else {
+        dispatch(deleteUserFailure(data.message || 'Failed to delete account'));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure('Failed to delete account'));
+      console.error('Error deleting account:', error);
+    }
+  }
+  const handleLogout = async () => {
+    try {
+      dispatch(logoutUserStart());
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include', // Include cookies in the request
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        dispatch(logoutUserSuccess());
+      } else {
+        dispatch(logoutUserFailure(data.message || 'Failed to logout'));
+      }
+    } catch (error) {
+      dispatch(logoutUserFailure('Failed to logout'));
+      console.error('Error logging out:', error);
+    }
+  }
 
   return (
     <div className="bg-slate-100 w-[95%] sm:w-[90%] md:w-[70%] lg:w-1/3 mx-auto my-10 p-5 rounded-lg shadow-md">
@@ -159,6 +204,7 @@ const Profile = () => {
             isChanged ? 'bg-slate-700 hover:bg-slate-500' : 'bg-slate-300 cursor-not-allowed'
           }`}
           disabled={!isChanged || isUploading || loading}
+
           onClick={handleUpdate}
         >
           {(loading || isUploading) ? 'Uploading...' : 'Update Profile'}
@@ -168,11 +214,66 @@ const Profile = () => {
           Create Listing
         </button>
 
-        <div className="flex gap-4 items-center justify-between w-full text-red-500">
-          <button type="button">Delete Account</button>
-          <button type="button">Logout</button>
-        </div>
+       <div className="flex gap-4 items-center justify-between w-full text-red-500">
+  <button type="button" onClick={() => setShowDeleteDialog(true)}>Delete Account</button>
+  <button type="button" onClick={() => setShowLogoutDialog(true)}>Logout</button>
+</div>
+
       </form>
+      {/* Delete Dialog */}
+{showDeleteDialog && (
+  <DialogBox
+    title="Confirm Deletion"
+    message="Are you sure you want to delete your account? This action is permanent."
+    onClose={() => setShowDeleteDialog(false)}
+  >
+    <div className="flex justify-end gap-4 mt-4">
+      <button
+        className="bg-gray-300 px-4 py-2 rounded"
+        onClick={() => setShowDeleteDialog(false)}
+      >
+        Cancel
+      </button>
+      <button
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500"
+        onClick={() => {
+          setShowDeleteDialog(false);
+          handleDelete();
+        }}
+      >
+        Yes, Delete
+      </button>
+    </div>
+  </DialogBox>
+)}
+
+{/* Logout Dialog */}
+{showLogoutDialog && (
+  <DialogBox
+    title="Confirm Logout"
+    message="Are you sure you want to log out?"
+    onClose={() => setShowLogoutDialog(false)}
+  >
+    <div className="flex justify-end gap-4 mt-4">
+      <button
+        className="bg-gray-300 px-4 py-2 rounded"
+        onClick={() => setShowLogoutDialog(false)}
+      >
+        Cancel
+      </button>
+      <button
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500"
+        onClick={() => {
+          setShowLogoutDialog(false);
+          handleLogout();
+        }}
+      >
+        Yes, Logout
+      </button>
+    </div>
+  </DialogBox>
+)}
+
     </div>
   );
 };

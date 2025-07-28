@@ -99,10 +99,18 @@ const google = async (req, res, next) => {
     next(error);
   }
 };
-
+const logout = async(req, res, next) => {
+    try {
+        res.clearCookie("access_token");
+        res.status(200).json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
 
 module.exports = {
   register,
   login,
-   google
+   google,
+  logout
 };
