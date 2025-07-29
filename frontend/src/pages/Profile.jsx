@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { updateUserStart , updateUserFailure , updateUserSuccess , deleteUserFailure , deleteUserStart , deleteUserSuccess, logoutUserFailure , logoutUserSuccess , logoutUserStart} from '../services/userSlice';
 import DialogBox from '../components/DialogBox';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -209,10 +210,11 @@ const [showLogoutDialog, setShowLogoutDialog] = useState(false);
         >
           {(loading || isUploading) ? 'Uploading...' : 'Update Profile'}
         </button>
-
-        <button className="bg-green-700 text-white w-full p-2 rounded-md hover:bg-green-500">
+         <Link className="bg-green-700 text-white w-full text-center p-2 rounded-md hover:bg-green-500" to='/create-listing'>
+        <button >
           Create Listing
         </button>
+        </Link>
 
        <div className="flex gap-4 items-center justify-between w-full text-red-500">
   <button type="button" onClick={() => setShowDeleteDialog(true)}>Delete Account</button>

@@ -19,7 +19,7 @@ const listingSchema = new mongoose.Schema({
     },
     discountedPrice: {
         type: Number,
-        required: true,
+        required: false,
     },
     bathrooms: {
         type: Number,
@@ -48,7 +48,7 @@ const listingSchema = new mongoose.Schema({
     },
     imageUrls: {
         type: [String],
-        required: true,
+        required: true, 
     },
     userRef: {
         type: mongoose.Schema.Types.ObjectId,

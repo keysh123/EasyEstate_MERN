@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from "./components/PrivateRoute";
+import CreateListing from "./pages/CreateListing";
 
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/create-listing" element={<CreateListing />} />
         </Route>
         <Route path="/about" element={<About />} />
       </Routes>
