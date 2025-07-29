@@ -1,5 +1,5 @@
 const User = require('../models/userModel');
-
+const { errorHandler } = require("../utils/error");
 const updateUser = async (req, res ,next) => {
     try{
         const {username,email,profilePicture } = req.body;

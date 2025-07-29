@@ -7,6 +7,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const userRoute = require('./routes/userRoute');
 const authRouter = require('./routes/authRouter');
+const listingRoute = require('./routes/listingRoute');
 
 
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRouter);
+app.use('/api/listings', listingRoute);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
