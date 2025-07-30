@@ -7,24 +7,25 @@ import About from "./pages/About";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
-import {ToastContainer} from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./components/PrivateRoute";
 import CreateListing from "./pages/CreateListing";
-
+import ViewListing from "./pages/ViewListing";
 
 const App = () => {
   return (
     <>
-    <Header/>
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/listing/:id" element={<ViewListing/>} />
         <Route element={<PrivateRoute />}>
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/create-listing" element={<CreateListing />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/create-listing" element={<CreateListing />} />
         </Route>
         <Route path="/about" element={<About />} />
       </Routes>

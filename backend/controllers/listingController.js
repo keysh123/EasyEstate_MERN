@@ -67,7 +67,6 @@ const editListing = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "Listing not found",
-        
       });
     }
 
@@ -90,10 +89,27 @@ const editListing = async (req, res, next) => {
     next(err);
   }
 };
+const getListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      next(errorHandler(404, "No such listing"));
+    }
+
+    res.status(200).json({
+      success: true,
+      // message: "User listings fetched successfully",
+      listing,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = {
   createListing,
   getUserListing,
   deleteListing,
   editListing,
+  getListing,
 };
