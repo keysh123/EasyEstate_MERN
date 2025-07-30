@@ -91,14 +91,15 @@ const editListing = async (req, res, next) => {
 };
 const getListing = async (req, res, next) => {
   try {
-    const listing = await Listing.findById(req.params.id);
+    const listing = await Listing.findById(req.params.id).populate('userRef', 'email username');
     if (!listing) {
       next(errorHandler(404, "No such listing"));
     }
-
+    console.log(listing);
+    
     res.status(200).json({
       success: true,
-      // message: "User listings fetched successfully",
+     
       listing,
     });
   } catch (err) {
