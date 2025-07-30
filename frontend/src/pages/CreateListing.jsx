@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-// import { useNavigate } from "react-router-dom";
+import { useSelector , useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { createListing , editListing } from "../services/myListingSlice";
 
 const CreateListing = () => {
   const { currentUser } = useSelector((state) => state.user);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const editData = location.state?.listing || null; // Passed from edit page
+  const isEditMode = Boolean(editData);
 
   const [files, setFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -22,7 +28,11 @@ const CreateListing = () => {
     offer: false,
     imageUrls: [],
   });
-
+  useEffect(() => {
+    if (isEditMode && editData) {
+      setFormData(editData);
+    }
+  }, [editData]);
   const resetForm = () => {
     setFormData({
       name: "",
@@ -98,43 +108,39 @@ const CreateListing = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!formData.type) {
-      toast.error("Select at least one type");
-      return;
-    }
+  if (!formData.type) {
+    toast.error("Select at least one type");
+    return;
+  }
+  const data = {
+    ...formData,
+    'userRef' : currentUser._id
+  }
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/listings/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            ...formData,
-            userRef: currentUser._id,
-          }),
-        }
+  try {
+    if (isEditMode) {
+      await dispatch(
+        editListing({ listingId: editData._id, updatedData: formData })
       );
-
-      const data = await response.json();
-      if (data.success) {
-        toast.success("Listing created successfully!");
-        resetForm();
-        // navigate('/'); // Optional redirect after submission
-      } else {
-        toast.error(data.message || "Failed to create listing");
-      }
-    } catch (err) {
-      toast.error("Problem in creating listing, try again later");
-      console.error(err);
+      navigate('/')
+    } else {
+      await dispatch(createListing(data));
     }
-  };
+
+    // Optional: reset or navigate after success
+    resetForm();
+    // navigate("/my-listings");
+  } catch (error) {
+    console.log(error);
+    
+    toast.error('Problem...try again')
+    // Error toast already shown inside the thunk
+  }
+};
+
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
@@ -313,7 +319,7 @@ const CreateListing = () => {
             disabled={isUploading}
             className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-md mt-4 disabled:opacity-50"
           >
-            {isUploading ? "Please wait..." : "Create Listing"}
+            {isUploading ? "Please wait..." : isEditMode ? "Edit Listing" : "Create Listing"}
           </button>
         </div>
       </form>
