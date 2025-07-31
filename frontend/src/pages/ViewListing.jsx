@@ -2,20 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import {
-  FaMapMarkerAlt,
-  FaBed,
-  FaBath,
-  FaParking,
-  FaCouch,
-  FaShareAlt,
-  FaArrowLeft,
-  FaArrowRight,
-  FaUser,
-  FaEnvelope,
-  FaPhone
+  FaMapMarkerAlt, FaBed, FaBath, FaParking, FaCouch, FaShareAlt,
+  FaArrowLeft, FaArrowRight, FaUser, FaEnvelope, FaPhone
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useSelector } from 'react-redux';
@@ -31,13 +21,11 @@ const ViewListing = () => {
 
   const fetchListingData = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/listings/${params.id}`
-      );
-      const data = await response.json();
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/listings/${params.id}`);
+      const data = await res.json();
       if (data.success) setListing(data.listing);
     } catch (err) {
-      console.error('Failed to fetch listing:', err);
+      console.error('Fetch error:', err);
     }
   };
 
@@ -48,8 +36,8 @@ const ViewListing = () => {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
+    toast.success('Link copied!');
     setTimeout(() => setCopied(false), 2000);
-    toast.success('Link copied to clipboard!');
   };
 
   const handleContactClick = () => {
@@ -58,50 +46,36 @@ const ViewListing = () => {
       toast.info('Please sign in to contact the owner');
       return;
     }
-    setShowContact(!showContact);
-   
-    
+    setShowContact(true);
     setMessage(`Hi, I'm interested in your ${listing.type} at ${listing.address}.`);
   };
 
   const handleSendMessage = () => {
     const subject = `Regarding your ${listing.type} at ${listing.address}`;
-    const mailtoLink = `mailto:${listing.userRef.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-    window.location.href = mailtoLink;
+    const mailto = `mailto:${listing.userRef.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    window.location.href = mailto;
   };
 
   const arrowStyle = {
     position: 'absolute',
     top: '50%',
     transform: 'translateY(-50%)',
-    zIndex: 50,
-    background: 'rgba(255,255,255,0.7)',
+    zIndex: 10,
+    background: 'rgba(255,255,255,0.8)',
     borderRadius: '50%',
     padding: '10px',
     cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
   };
 
   const NextArrow = ({ onClick }) => (
-    <div 
-      style={{ ...arrowStyle, right: '20px' }} 
-      onClick={onClick}
-      className="hover:bg-white transition-all duration-200"
-    >
-      <FaArrowRight className="text-blue-600 text-xl" />
+    <div style={{ ...arrowStyle, right: '20px' }} onClick={onClick}>
+      <FaArrowRight className="text-blue-600 text-lg" />
     </div>
   );
 
   const PrevArrow = ({ onClick }) => (
-    <div 
-      style={{ ...arrowStyle, left: '20px' }} 
-      onClick={onClick}
-      className="hover:bg-white transition-all duration-200"
-    >
-      <FaArrowLeft className="text-blue-600 text-xl" />
+    <div style={{ ...arrowStyle, left: '20px' }} onClick={onClick}>
+      <FaArrowLeft className="text-blue-600 text-lg" />
     </div>
   );
 
@@ -117,167 +91,126 @@ const ViewListing = () => {
     prevArrow: <PrevArrow />,
   };
 
-  if (!listing) return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  if (!listing) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full mx-auto p-4 md:p-6 max-w-7xl">
-      {/* Image Slider */}
-      <div className="relative rounded-xl overflow-hidden shadow-lg">
+    <div className="w-full max-w-7xl mx-auto px-4 py-6">
+      {/* Slider */}
+      <div className="relative rounded-xl overflow-hidden shadow-md">
+        {listing.imageUrls.length >1 ?
         <Slider {...sliderSettings}>
-          {listing.imageUrls.map((url, i) => (
-            <div key={i}>
+          {listing.imageUrls.map((url, idx) => (
+            <div key={idx}>
               <img
                 src={url}
-                alt={`slide-${i}`}
-                className="w-full h-[450px] md:h-[550px] object-cover"
+                alt={`slide-${idx}`}
+                className="w-full h-[300px] md:h-[500px] object-cover"
               />
             </div>
           ))}
         </Slider>
-
-        {/* Share Button */}
+        : 
+        <img
+                src={listing.imageUrls[0]}
+                // alt={`slide-${idx}`}
+                className="w-full h-[300px] md:h-[500px] object-cover"
+              />}
         <button
           onClick={handleShare}
-          className="absolute top-4 right-4 bg-white/90 text-blue-600 border border-blue-600 px-3 py-2 rounded-full flex items-center gap-1 text-sm hover:bg-blue-50 z-30 shadow-md transition-all duration-200"
+          className="absolute top-4 right-4 bg-white px-3 py-2 rounded-full shadow text-sm flex items-center gap-2 text-blue-600 border border-blue-600 hover:bg-blue-50"
         >
           <FaShareAlt />
-          {copied ? 'Copied!' : ''}
+          {copied ? 'Copied!' : 'Share'}
         </button>
       </div>
 
-      {/* Listing Info */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800">{listing.name}</h1>
-          <div className="flex items-center gap-2 text-gray-600 mt-3">
-            <FaMapMarkerAlt className="text-blue-500" />
-            <span className="text-gray-700">{listing.address}</span>
+      {/* Info Grid */}
+      <div className="mt-6 grid md:grid-cols-3 gap-6">
+        {/* Left Column */}
+        <div className="md:col-span-2 space-y-4">
+          <h1 className="text-3xl font-bold text-gray-800">{listing.name}</h1>
+          <div className="flex items-center text-gray-600 gap-2">
+            <FaMapMarkerAlt className="text-blue-600" />
+            <p className="truncate">{listing.address}</p>
           </div>
+          <p className="text-gray-700 mt-3">{listing.description}</p>
 
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">Description</h2>
-            <p className="text-gray-700 leading-relaxed">{listing.description}</p>
-          </div>
-
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex items-center gap-3 text-gray-800">
-                <FaBed className="text-blue-500 text-xl" />
-                <div>
-                  <p className="font-medium">{listing.bedrooms}</p>
-                  <p className="text-sm text-gray-600">Bedrooms</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex items-center gap-3 text-gray-800">
-                <FaBath className="text-blue-500 text-xl" />
-                <div>
-                  <p className="font-medium">{listing.bathrooms}</p>
-                  <p className="text-sm text-gray-600">Bathrooms</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex items-center gap-3 text-gray-800">
-                <FaParking className="text-blue-500 text-xl" />
-                <div>
-                  <p className="font-medium">{listing.parking ? 'Yes' : 'No'}</p>
-                  <p className="text-sm text-gray-600">Parking</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex items-center gap-3 text-gray-800">
-                <FaCouch className="text-blue-500 text-xl" />
-                <div>
-                  <p className="font-medium">{listing.furnished ? 'Yes' : 'No'}</p>
-                  <p className="text-sm text-gray-600">Furnished</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex flex-col">
-                <p className="font-medium capitalize">{listing.type}</p>
-                <p className="text-sm text-gray-600">Type</p>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex flex-col">
-                <p className="font-medium">₹{listing.price.toLocaleString()}</p>
-                <p className="text-sm text-gray-600">Price</p>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            <FeatureCard icon={<FaBed />} label="Bedrooms" value={listing.bedrooms} />
+            <FeatureCard icon={<FaBath />} label="Bathrooms" value={listing.bathrooms} />
+            <FeatureCard icon={<FaParking />} label="Parking" value={listing.parking ? 'Yes' : 'No'} />
+            <FeatureCard icon={<FaCouch />} label="Furnished" value={listing.furnished ? 'Yes' : 'No'} />
+            <FeatureCard label="Type" value={listing.type} />
+            <FeatureCard label="Price" value={`₹${listing.price.toLocaleString()}`} />
           </div>
         </div>
 
-        {/* Contact Section */}
-        <div className="bg-white rounded-xl shadow-md p-6 h-fit sticky top-6">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="bg-blue-100 p-3 rounded-full">
-              <FaUser className="text-blue-600 text-xl" />
+        {/* Contact Box */}
+        <div className="bg-white rounded-lg shadow-md p-5 h-fit sticky top-20">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <FaUser className="text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">Owner Information</h3>
-              <p className="text-sm text-gray-600">Posted by {listing.userRef.username}</p>
+              <h4 className="font-semibold">Owner</h4>
+              <p className="text-sm text-gray-600">{listing.userRef.username}</p>
             </div>
           </div>
 
           {!showContact ? (
             <button
               onClick={handleContactClick}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 shadow-md"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded shadow"
             >
               Contact Owner
             </button>
           ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-gray-700">
-                <FaEnvelope className="text-blue-500" />
-                <span>{listing.userRef.email}</span>
-              </div>
+            <div className="space-y-3">
+              <ContactInfo icon={<FaEnvelope />} text={listing.userRef.email} />
               {listing.userRef.phone && (
-                <div className="flex items-center gap-3 text-gray-700">
-                  <FaPhone className="text-blue-500" />
-                  <span>{listing.userRef.phone}</span>
-                </div>
+                <ContactInfo icon={<FaPhone />} text={listing.userRef.phone} />
               )}
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                rows="5"
-                placeholder="Your message..."
+                rows="4"
+                className="w-full border border-gray-300 rounded p-2"
               />
               <button
                 onClick={handleSendMessage}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 shadow-md"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded shadow"
               >
                 Send Message
               </button>
             </div>
           )}
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h4 className="font-medium text-gray-800 mb-2">Price Details</h4>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Listing Price</span>
-              <span className="font-semibold">₹{listing.price.toLocaleString()}</span>
-            </div>
-            <div className="mt-2 pt-2 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                Contact the owner for negotiation and more details about the property.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 };
+
+const FeatureCard = ({ icon, label, value }) => (
+  <div className="bg-gray-50 p-4 rounded-md shadow-sm flex gap-3 items-center">
+    {icon && <div className="text-blue-600 text-lg">{icon}</div>}
+    <div>
+      <p className="font-medium">{value}</p>
+      {label && <p className="text-sm text-gray-600">{label}</p>}
+    </div>
+  </div>
+);
+
+const ContactInfo = ({ icon, text }) => (
+  <div className="flex items-center gap-2 text-gray-700">
+    {icon}
+    <span>{text}</span>
+  </div>
+);
 
 export default ViewListing;

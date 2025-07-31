@@ -22,6 +22,10 @@ const Header = () => {
     const urlParams = new URLSearchParams(location.search)
     setSearchTerm(urlParams.get('searchTerm'))
   },[location.search])
+  useEffect(()=>{
+    const urlParams = new URLSearchParams(location.search)
+    setSearchTerm(urlParams.get('searchTerm'))
+  },[])
 
   return (
     <header className='bg-slate-200 shadow-md sticky top-0 z-50'>
