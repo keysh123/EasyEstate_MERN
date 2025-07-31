@@ -93,7 +93,14 @@ const Header = () => {
             <Link to='/about' onClick={() => setMenuOpen(false)} className='block hover:underline'>About</Link>
           </li>
           <li>
-            <Link to='/login' onClick={() => setMenuOpen(false)} className='block hover:underline'>Sign In</Link>
+            {/* <Link to='/login' onClick={() => setMenuOpen(false)} className='block hover:underline'>Sign In</Link> */}
+           <Link to='/profile' className='hover:underline'>
+            {
+              currentUser ?
+              <span>My Profile</span> :
+              <span>Sign In</span>
+            }
+            </Link>
           </li>
         </ul>
       )}
